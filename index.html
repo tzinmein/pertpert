@@ -55,6 +55,13 @@
         backdrop-filter: blur(2px);
       }
 
+      /* When the UI is collapsed we want the photo fully visible; remove the overlay blur and make overlay subtle */
+      :root.ui-collapsed .overlay{
+        backdrop-filter: none;
+        background: linear-gradient(to bottom right, rgba(0,0,0,0.06), rgba(0,0,0,0.06));
+        opacity: 0.85; /* keep a tiny bit of darkening so the image still reads well on small screens */
+      }
+
       header {
         display: flex;
         align-items: center;
