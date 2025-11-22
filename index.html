@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rupert — A Whimsical Homage (Black Cat)</title>
+    <title>Rupert — A Whimsical Homage</title>
     <meta
       name="description"
       content="A whimsical tribute to Rupert, the cat — minimal, fast, accessible, and playful."
@@ -16,7 +16,7 @@
     />
     <style>
       :root {
-        --accent: #ffc857; /* amber accent to contrast beautifully with a black cat */
+        --accent: #ffc857; /* amber accent chosen to warm the scene */
         --glass: rgba(255, 255, 255, 0.15);
         --glass-strong: rgba(255, 255, 255, 0.22);
         --bg-fallback: #0e0b16;
@@ -152,6 +152,60 @@
         font-weight: 700;
       }
 
+      /* Collapsible UI (hide/show controls and header card) */
+      .ui-toggle {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 30;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .ui-toggle button {
+        --size: 46px;
+        width: var(--size);
+        height: var(--size);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: rgba(0, 0, 0, 0.45);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+      .ui-toggle .mini {
+        width: 38px;
+        height: 38px;
+        --size: 38px;
+      }
+      .ui-collapse-hint {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 6px 10px;
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+      }
+
+      /* When UI is collapsed hide decorations but keep the floating toggle visible */
+      :root.ui-collapsed .card,
+      :root.ui-collapsed header,
+      :root.ui-collapsed footer,
+      :root.ui-collapsed .controls {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(6px);
+        pointer-events: none;
+      }
+
+      /* When collapsed, hide the small edit marker and controls overlays */
+      :root.ui-collapsed .spot-marker {
+        display: none;
+      }
+
       @keyframes float {
         0% {
           transform: translateY(0);
@@ -252,7 +306,7 @@
       <!-- If you don't have a JPG fallback, this will simply failover to the webp or show background color -->
       <img
         src="boyboy.webp"
-        alt="Rupert, the black cat, lying on his back with his tummy exposed, soaking up sunbeams"
+        alt="Rupert lying on his back with his tummy exposed, soaking up sunbeams"
         class="bg-image"
         loading="eager"
         decoding="async"
@@ -264,7 +318,7 @@
 
     <header role="banner">
       <main class="card content" role="main" aria-labelledby="rupert-title">
-        <h1 id="rupert-title">Rupert 🐱 — Keeper of Sunbeams (Black Cat)</h1>
+        <h1 id="rupert-title">Rupert 🐱 — Keeper of Sunbeams</h1>
         <p class="lead">
           A tiny, grateful shout-out to Rupert — now a wise and retired nap
           champion. He’s a little grumpier these days, not keen on toys, and
@@ -272,7 +326,7 @@
         </p>
 
         <div class="meta" aria-hidden="true">
-          <small>Chief Nap Officer — black fur, warm heart</small>
+          <small>Chief Nap Officer — warm heart</small>
           <small>Professional Purrer</small>
           <small id="mood" role="status" aria-live="polite"
             >Mood: Grumpy — loves meals on time</small
@@ -295,6 +349,12 @@
           <!-- Spotlight controls -->
           <button class="btn" id="toggle-spot">Toggle Spotlight</button>
           <button class="btn" id="edit-spot">Edit Spotlight</button>
+        </div>
+        <!-- small collapse control inside the UI for convenience -->
+        <div style="display: flex; justify-content: center; margin-top: 10px">
+          <button id="collapse-ui" class="btn" title="Hide UI to see Rupert">
+            Hide UI
+          </button>
         </div>
         <div class="controls" aria-hidden="true" style="margin-top: 0.6rem">
           <label
@@ -328,6 +388,12 @@
     <footer>
       <small>Made with ❤️ for Rupert</small>
     </footer>
+
+    <!-- global floating toggle when UI is collapsed/visible -->
+    <div class="ui-toggle" aria-hidden="false">
+      <div class="ui-collapse-hint" id="collapse-hint">UI visible</div>
+      <button id="show-ui" aria-expanded="true" title="Show/Hide UI">👀</button>
+    </div>
 
     <script>
       // Small interactive touches — optional, unobtrusive, and respects reduced motion
@@ -597,6 +663,43 @@
           spotMarker.style.left = sx;
           spotMarker.style.top = sy;
         })();
+
+        /* Collapsible UI: hide all chrome so the background photo is unobstructed */
+        const bodyRoot = document.documentElement;
+        const collapseBtn = document.getElementById("collapse-ui");
+        const showBtn = document.getElementById("show-ui");
+        const collapseHint = document.getElementById("collapse-hint");
+        const uiKey = "rupert-ui-collapsed";
+
+        function setCollapsed(collapsed) {
+          if (collapsed) {
+            bodyRoot.classList.add("ui-collapsed");
+            showBtn.setAttribute("aria-expanded", "false");
+            collapseHint.textContent = "UI hidden — click 👀 to show";
+            showBtn.textContent = "🔎";
+          } else {
+            bodyRoot.classList.remove("ui-collapsed");
+            showBtn.setAttribute("aria-expanded", "true");
+            collapseHint.textContent = "UI visible";
+            showBtn.textContent = "👀";
+          }
+          try {
+            localStorage.setItem(uiKey, collapsed ? "1" : "0");
+          } catch (e) {}
+        }
+
+        // initial load
+        try {
+          const v = localStorage.getItem(uiKey);
+          setCollapsed(Boolean(v === "1"));
+        } catch (e) {
+          setCollapsed(false);
+        }
+
+        collapseBtn.addEventListener("click", () => setCollapsed(true));
+        showBtn.addEventListener("click", () =>
+          setCollapsed(!bodyRoot.classList.contains("ui-collapsed"))
+        );
       })();
     </script>
   </body>

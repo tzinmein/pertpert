@@ -19,6 +19,11 @@ Spotlight feature:
 - Click "Edit Spotlight" then click the image to position the spotlight center; adjust spot size and intensity using the sliders.
 - Spotlight settings are persisted to localStorage to keep your preferred position/intensity.
 
+Hide UI / full-screen view:
+
+- There's a small "Hide UI" button in the page that collapses the header card, controls and footer so you can see Rupert unobstructed.
+- When the UI is hidden a floating control (👀) is available — click it to restore the UI. The collapsed/visible state persists across page loads.
+
 How to view
 
 1. Place `boyboy.webp` in the repository root (if not already placed).
