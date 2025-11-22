@@ -1,10 +1,10 @@
 # pertpert
 
-This repository contains a small, whimsical tribute page to my cat Rupert — a charming black cat. Rupert is older and a little grumpy, not much into toys, but he absolutely insists on his meals arriving on time. The page uses `boyboy.webp` as a full-page background and includes interactive, lightweight effects.
+This repository contains a small, whimsical tribute page to my cat Rupert — a charming companion. Rupert is older and a little grumpy, not much into toys, but he absolutely insists on his meals arriving on time. The page uses `boyboy.webp` as a full-page background and includes interactive, lightweight effects.
 
 Rupert's personality details:
 
-- Black cat, retired nap champion
+- Retired nap champion
 - A little grumpy and mostly solitary
 - Not toy-friendly; prefers meals on schedule
 - Use the "Feed Rupert" button in the page to record when you last fed him — the value is stored locally in your browser.
@@ -47,8 +47,8 @@ Accessibility & performance
 - It's important to include `alt` text for the background image when applicable; an inline `<img>` with the `alt` text is used here.
 
 - The UI includes a simple "Feed Rupert" button that stores the last feeding time in your browser's `localStorage`; this is purely local and intended as a playful way to track a quick schedule.
-- Because Rupert is older and darker, we default the play/toy animations off — you can optionally enable them with the button if you like.
-- Since Rupert is black, the page includes a subtle overlay to ensure text is readable against his dark fur. If your photo has very low exposure, consider increasing overlay brightness or using a radial spotlight in CSS to highlight the subject.
+- Because Rupert is older and the photo can be dark, we default the play/toy animations off — you can optionally enable them with the button if you like.
+- The page includes a subtle overlay to ensure text is readable against dark photos. If your photo has very low exposure, consider increasing overlay brightness or using a radial spotlight in CSS to highlight the subject.
 
 License & notes
 
