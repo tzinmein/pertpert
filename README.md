@@ -9,6 +9,10 @@ Rupert's personality details:
 - Not toy-friendly; prefers meals on schedule
 - Use the "Feed Rupert" button in the page to record when you last fed him — the value is stored locally in your browser.
 
+Photo note:
+
+- The `boyboy.webp` photo shows Rupert lying on his back with his tummy exposed — a rare and dignified pose. The page contains a playful "Offer Tummy Rub" button; he may tolerate a brief rub if he's recently been fed.
+
 How to view
 
 1. Place `boyboy.webp` in the repository root (if not already placed).

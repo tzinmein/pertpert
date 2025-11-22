@@ -162,6 +162,20 @@
         }
       }
 
+      /* Transient toast for messages like the tummy rub result */
+      .toast {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        z-index: 60;
+      }
+
       /* Follow-cursor paw — prefers-reduced-motion opt-out */
       .paw {
         position: fixed;
@@ -203,7 +217,7 @@
       <!-- If you don't have a JPG fallback, this will simply failover to the webp or show background color -->
       <img
         src="boyboy.webp"
-        alt="Rupert, the black cat, posing in sunbeams"
+        alt="Rupert, the black cat, lying on his back with his tummy exposed, soaking up sunbeams"
         class="bg-image"
         loading="eager"
         decoding="async"
@@ -223,7 +237,12 @@
         <div class="meta" aria-hidden="true">
           <small>Chief Nap Officer — black fur, warm heart</small>
           <small>Professional Purrer</small>
-          <small id="mood">Mood: Grumpy — loves meals on time</small>
+          <small id="mood" role="status" aria-live="polite"
+            >Mood: Grumpy — loves meals on time</small
+          >
+          <small id="tummy"
+            >Tummy: Exposed — do not rub without offering a meal</small
+          >
           <span class="badge" id="visits">Visits: 0</span>
           <span class="badge" id="last-fed" role="status" aria-live="polite"
             >Last fed: —</span
@@ -235,6 +254,7 @@
             Encourage Rupert (He may decline)
           </button>
           <button class="btn" id="feed-rupert">Feed Rupert</button>
+          <button class="btn" id="tummy-rub">Offer Tummy Rub</button>
         </div>
       </main>
     </header>
@@ -353,6 +373,37 @@
 
         // Initialize the last-fed display on load
         updateLastFedDisplay();
+
+        // Tummy rub behavior: playful interaction; response depends on last fed time
+        const tummyBtn = document.getElementById("tummy-rub");
+        const moodEl = document.getElementById("mood");
+
+        function showToast(msg) {
+          const t = document.createElement("div");
+          t.className = "toast";
+          t.textContent = msg;
+          t.setAttribute("role", "status");
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 1600);
+        }
+
+        tummyBtn.addEventListener("click", () => {
+          try {
+            const ts = Number(localStorage.getItem(feedKey) || 0);
+            const now = Date.now();
+            const recentlyFed = ts && now - ts < 90 * 60 * 1000; // 90 minutes
+            if (recentlyFed) {
+              showToast("A grudging purr — Rupert tolerates it after a meal.");
+              const prev = moodEl.textContent;
+              moodEl.textContent = "Mood: Content (briefly)";
+              setTimeout(() => (moodEl.textContent = prev), 1800);
+            } else {
+              showToast("He grumbled — perhaps feed him first.");
+            }
+          } catch (e) {
+            showToast("He huffed — he's a cat, not a plush toy.");
+          }
+        });
       })();
     </script>
   </body>
