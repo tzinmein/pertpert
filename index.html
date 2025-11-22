@@ -3,25 +3,357 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pert-Pert</title>
+    <title>Rupert — A Whimsical Homage (Black Cat)</title>
+    <meta
+      name="description"
+      content="A whimsical tribute to Rupert, the cat — minimal, fast, accessible, and playful."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --accent: #ffc857; /* amber accent to contrast beautifully with a black cat */
+        --glass: rgba(255, 255, 255, 0.15);
+        --glass-strong: rgba(255, 255, 255, 0.22);
+        --bg-fallback: #0e0b16;
+      }
       html,
       body {
         height: 100%;
         margin: 0;
         padding: 0;
+        font-family: Montserrat, system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
       }
-      body {
-        width: 100vw;
+
+      /* Background image as a positioned <img> gives WebP fallback and better loading control */
+      .bg-image {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -2;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      /* Gentle overlay to improve contrast and give whimsy */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          to bottom right,
+          rgba(0, 0, 0, 0.25),
+          rgba(0, 0, 0, 0.42)
+        );
+        z-index: -1;
+        backdrop-filter: blur(2px);
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         height: 100vh;
-        background-image: url("boyboy.webp");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        min-height: 100vh;
+        flex-direction: column;
+        text-align: center;
+        color: white;
+        padding: 2rem;
+      }
+
+      .card {
+        background: linear-gradient(135deg, var(--glass), var(--glass-strong));
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 900px;
+        margin: 1rem;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
+        transform-origin: center;
+        backdrop-filter: blur(8px);
+        animation: float 6s ease-in-out infinite;
+      }
+
+      h1 {
+        font-family: Pacifico, "Segoe Script", "Times New Roman", serif;
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3.4rem);
+        letter-spacing: 0.02em;
+      }
+      p.lead {
+        margin: 0.8rem 0 1.4rem;
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 300;
+        font-size: 1.15rem;
+      }
+
+      .meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.5rem;
+      }
+      .meta small {
+        opacity: 0.92;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 8px 12px;
+        border-radius: 999px;
+      }
+
+      /* Yarn sprites */
+      .yarn {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 25;
+        mix-blend-mode: screen;
+      }
+      .yarn--gold {
+        background: #ffd166;
+        box-shadow: 0 0 10px #ffbf4d;
+      }
+      .yarn--teal {
+        background: #7df9e8;
+        box-shadow: 0 0 10px #5fe9d6;
+      }
+
+      /* Visit counter */
+      .badge {
+        display: inline-block;
+        padding: 6px 10px;
+        background: rgba(0, 0, 0, 0.35);
+        border-radius: 999px;
+        font-size: 0.92rem;
+      }
+
+      /* Controls */
+      .controls {
+        margin-top: 1.1rem;
+        display: flex;
+        gap: 0.6rem;
+        justify-content: center;
+      }
+      .btn {
+        background: var(--accent);
+        color: white;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      /* Follow-cursor paw — prefers-reduced-motion opt-out */
+      .paw {
+        position: fixed;
+        pointer-events: none;
+        font-size: 24px;
+        transform: translate(-50%, -50%);
+        opacity: 0.9;
+        z-index: 40;
+        mix-blend-mode: screen;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card {
+          animation: none;
+        }
+        .yarn {
+          animation: none;
+        }
+      }
+
+      /* Make the page readable across devices */
+      .content {
+        max-width: clamp(320px, 65vw, 780px);
+        margin: 0 auto;
+      }
+      footer {
+        position: fixed;
+        bottom: 12px;
+        left: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
       }
     </style>
   </head>
-  <body></body>
+  <body>
+    <!-- Modern responsive background with WebP source and fallback -->
+    <picture>
+      <source srcset="boyboy.webp" type="image/webp" />
+      <!-- If you don't have a JPG fallback, this will simply failover to the webp or show background color -->
+      <img
+        src="boyboy.webp"
+        alt="Rupert, the black cat, posing in sunbeams"
+        class="bg-image"
+        loading="eager"
+        decoding="async"
+      />
+    </picture>
+    <div class="overlay" aria-hidden="true"></div>
+
+    <header role="banner">
+      <main class="card content" role="main" aria-labelledby="rupert-title">
+        <h1 id="rupert-title">Rupert 🐱 — Keeper of Sunbeams (Black Cat)</h1>
+        <p class="lead">
+          A tiny, grateful shout-out to Rupert — now a wise and retired nap
+          champion. He’s a little grumpier these days, not keen on toys, and
+          always insistent that his meals arrive on time.
+        </p>
+
+        <div class="meta" aria-hidden="true">
+          <small>Chief Nap Officer — black fur, warm heart</small>
+          <small>Professional Purrer</small>
+          <small id="mood">Mood: Grumpy — loves meals on time</small>
+          <span class="badge" id="visits">Visits: 0</span>
+          <span class="badge" id="last-fed" role="status" aria-live="polite"
+            >Last fed: —</span
+          >
+        </div>
+
+        <div class="controls" aria-hidden="true">
+          <button class="btn" id="toggle-yarn">
+            Encourage Rupert (He may decline)
+          </button>
+          <button class="btn" id="feed-rupert">Feed Rupert</button>
+        </div>
+      </main>
+    </header>
+
+    <aside aria-hidden="true">
+      <div id="paw" class="paw">🐾</div>
+    </aside>
+
+    <footer>
+      <small>Made with ❤️ for Rupert</small>
+    </footer>
+
+    <script>
+      // Small interactive touches — optional, unobtrusive, and respects reduced motion
+      (function () {
+        const visitsEl = document.getElementById("visits");
+        try {
+          const key = "rupert-visits";
+          let v = Number(localStorage.getItem(key) || 0);
+          v = v + 1;
+          localStorage.setItem(key, v);
+          visitsEl.textContent = "Visits: " + v;
+        } catch (e) {
+          visitsEl.textContent = "Visits: —";
+        }
+
+        const paw = document.getElementById("paw");
+        const prefersReduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        if (!prefersReduced) {
+          window.addEventListener("mousemove", (e) => {
+            paw.style.left = e.clientX + "px";
+            paw.style.top = e.clientY + "px";
+          });
+        } else {
+          paw.style.display = "none";
+        }
+
+        // Yarn bits generation
+        let yarnActive = false;
+        const yarnTypes = ["yarn--gold", "yarn--teal"];
+
+        function spawnYarn() {
+          if (!yarnActive) return;
+          const el = document.createElement("div");
+          el.className =
+            "yarn " + yarnTypes[Math.floor(Math.random() * yarnTypes.length)];
+          const startLeft = Math.random() * 80 + 10; // between 10% and 90%
+          el.style.left = startLeft + "vw";
+          el.style.top = "100vh";
+          const size = 8 + Math.random() * 18;
+          el.style.width = size + "px";
+          el.style.height = size + "px";
+          document.body.appendChild(el);
+
+          // Upwards float animation
+          const duration = 2000 + Math.random() * 3000;
+          el.animate(
+            [
+              { transform: `translateY(0px)`, opacity: 1 },
+              {
+                transform: `translateY(-${40 + Math.random() * 60}vh)`,
+                opacity: 0,
+              },
+            ],
+            { duration, easing: "cubic-bezier(.2,.9,.3,1)" }
+          );
+
+          setTimeout(() => el.remove(), duration);
+          setTimeout(spawnYarn, 350 + Math.random() * 1200);
+        }
+
+        const toggleBtn = document.getElementById("toggle-yarn");
+        toggleBtn.addEventListener("click", () => {
+          yarnActive = !yarnActive;
+          toggleBtn.textContent = yarnActive
+            ? "Pause Rupert's Antics"
+            : "Encourage Rupert (He may decline)";
+          if (yarnActive) spawnYarn();
+        });
+
+        // Feeding logic: show last-fed time and allow 'feeding' Rupert (localStorage persisted)
+        const lastFedEl = document.getElementById("last-fed");
+        const feedBtn = document.getElementById("feed-rupert");
+        const feedKey = "rupert-last-fed";
+
+        function updateLastFedDisplay() {
+          try {
+            const ts = localStorage.getItem(feedKey);
+            if (!ts) {
+              lastFedEl.textContent = "Last fed: —";
+              return;
+            }
+            const d = new Date(Number(ts));
+            lastFedEl.textContent =
+              "Last fed: " +
+              d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          } catch (e) {
+            lastFedEl.textContent = "Last fed: —";
+          }
+        }
+
+        feedBtn.addEventListener("click", () => {
+          try {
+            const now = Date.now();
+            localStorage.setItem(feedKey, String(now));
+            updateLastFedDisplay();
+            feedBtn.textContent = "Fed — Thank you!";
+            setTimeout(() => (feedBtn.textContent = "Feed Rupert"), 1800);
+          } catch (e) {
+            // ignore storage errors
+          }
+        });
+
+        // Initialize the last-fed display on load
+        updateLastFedDisplay();
+      })();
+    </script>
+  </body>
 </html>
