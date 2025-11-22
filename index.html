@@ -76,6 +76,8 @@
         transform-origin: center;
         backdrop-filter: blur(8px);
         animation: float 6s ease-in-out infinite;
+        position: relative;
+        z-index: 2;
       }
 
       h1 {
@@ -176,6 +178,39 @@
         z-index: 60;
       }
 
+      /* Spotlight spotlight overlay to highlight Rupert's tummy */
+      .spotlight {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        --spot-x: 55%;
+        --spot-y: 44%;
+        --spot-size: 22%;
+        --spot-strength: 0.22;
+        mix-blend-mode: screen; /* lighten underlying image */
+        background: radial-gradient(
+          circle at var(--spot-x) var(--spot-y),
+          rgba(255, 255, 210, var(--spot-strength)) 0%,
+          rgba(255, 255, 210, 0) var(--spot-size)
+        );
+        opacity: 1;
+        transition: opacity 180ms linear, background 180ms linear;
+      }
+
+      /* A small visual marker while editing the spotlight position */
+      .spot-marker {
+        position: fixed;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 2px solid rgba(255, 255, 255, 0.95);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10;
+        display: none;
+      }
+
       /* Follow-cursor paw — prefers-reduced-motion opt-out */
       .paw {
         position: fixed;
@@ -224,6 +259,8 @@
       />
     </picture>
     <div class="overlay" aria-hidden="true"></div>
+    <div class="spotlight" id="spotlight" aria-hidden="true"></div>
+    <div class="spot-marker" id="spot-marker" aria-hidden="true"></div>
 
     <header role="banner">
       <main class="card content" role="main" aria-labelledby="rupert-title">
@@ -255,6 +292,31 @@
           </button>
           <button class="btn" id="feed-rupert">Feed Rupert</button>
           <button class="btn" id="tummy-rub">Offer Tummy Rub</button>
+          <!-- Spotlight controls -->
+          <button class="btn" id="toggle-spot">Toggle Spotlight</button>
+          <button class="btn" id="edit-spot">Edit Spotlight</button>
+        </div>
+        <div class="controls" aria-hidden="true" style="margin-top: 0.6rem">
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.6rem;
+              color: rgba(255, 255, 255, 0.9);
+            "
+            >Spot size
+            <input id="spot-size" type="range" min="8" max="60" value="22"
+          /></label>
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 0.6rem;
+              color: rgba(255, 255, 255, 0.9);
+            "
+            >Intensity
+            <input id="spot-intensity" type="range" min="0" max="60" value="22"
+          /></label>
         </div>
       </main>
     </header>
@@ -404,6 +466,137 @@
             showToast("He huffed — he's a cat, not a plush toy.");
           }
         });
+
+        // Spotlight controls: toggling, editing position, size & intensity
+        const spotlight = document.getElementById("spotlight");
+        const spotMarker = document.getElementById("spot-marker");
+        const toggleSpotBtn = document.getElementById("toggle-spot");
+        const editSpotBtn = document.getElementById("edit-spot");
+        const spotSizeInput = document.getElementById("spot-size");
+        const spotIntensityInput = document.getElementById("spot-intensity");
+        const spotKey = "rupert-spot-settings";
+        let editMode = false;
+
+        // Load saved settings
+        function loadSpotSettings() {
+          try {
+            const s = JSON.parse(localStorage.getItem(spotKey) || "{}");
+            if (s.x)
+              document.documentElement.style.setProperty("--spot-x", s.x);
+            if (s.y)
+              document.documentElement.style.setProperty("--spot-y", s.y);
+            if (s.size)
+              document.documentElement.style.setProperty("--spot-size", s.size);
+            if (s.strength)
+              document.documentElement.style.setProperty(
+                "--spot-strength",
+                s.strength
+              );
+            if (s.enabled === false) spotlight.style.opacity = 0;
+            if (s.size) {
+              spotSizeInput.value = Number(s.size.replace("%", ""));
+            }
+            if (s.strength) {
+              spotIntensityInput.value = Math.round(Number(s.strength) * 100);
+            }
+          } catch (e) {
+            /* ignore */
+          }
+        }
+        loadSpotSettings();
+        // update toggle button label if saved settings indicate off
+        if (spotlight.style.opacity === "0") {
+          toggleSpotBtn && (toggleSpotBtn.textContent = "Spotlight Off");
+        } else {
+          toggleSpotBtn && (toggleSpotBtn.textContent = "Spotlight On");
+        }
+
+        // Save
+        function saveSpotSettings() {
+          try {
+            const s = {
+              x:
+                getComputedStyle(document.documentElement)
+                  .getPropertyValue("--spot-x")
+                  .trim() || "55%",
+              y:
+                getComputedStyle(document.documentElement)
+                  .getPropertyValue("--spot-y")
+                  .trim() || "44%",
+              size:
+                getComputedStyle(document.documentElement)
+                  .getPropertyValue("--spot-size")
+                  .trim() || "22%",
+              strength:
+                getComputedStyle(document.documentElement)
+                  .getPropertyValue("--spot-strength")
+                  .trim() || "0.22",
+              enabled: spotlight.style.opacity !== "0",
+            };
+            localStorage.setItem(spotKey, JSON.stringify(s));
+          } catch (e) {}
+        }
+
+        toggleSpotBtn.addEventListener("click", () => {
+          if (spotlight.style.opacity === "0") {
+            spotlight.style.opacity = 1;
+            toggleSpotBtn.textContent = "Spotlight On";
+          } else {
+            spotlight.style.opacity = 0;
+            toggleSpotBtn.textContent = "Spotlight Off";
+          }
+          saveSpotSettings();
+        });
+
+        editSpotBtn.addEventListener("click", () => {
+          editMode = !editMode;
+          editSpotBtn.textContent = editMode ? "Finish Edit" : "Edit Spotlight";
+          spotMarker.style.display = editMode ? "block" : "none";
+        });
+
+        // Adjust size & intensity
+        spotSizeInput.addEventListener("input", (e) => {
+          const v = parseInt(e.target.value, 10);
+          document.documentElement.style.setProperty("--spot-size", v + "%");
+          saveSpotSettings();
+        });
+        spotIntensityInput.addEventListener("input", (e) => {
+          const v = parseInt(e.target.value, 10) / 100.0;
+          document.documentElement.style.setProperty(
+            "--spot-strength",
+            String(v)
+          );
+          saveSpotSettings();
+        });
+
+        // If edit mode: clicking updates the center position
+        window.addEventListener("click", (ev) => {
+          if (!editMode) return;
+          // Find viewport coords
+          const x = (ev.clientX / window.innerWidth) * 100;
+          const y = (ev.clientY / window.innerHeight) * 100;
+          const xs = x.toFixed(1) + "%";
+          const ys = y.toFixed(1) + "%";
+          document.documentElement.style.setProperty("--spot-x", xs);
+          document.documentElement.style.setProperty("--spot-y", ys);
+          spotMarker.style.left = xs;
+          spotMarker.style.top = ys;
+          saveSpotSettings();
+        });
+
+        // Update marker initial position
+        (function initMarker() {
+          const sx =
+            getComputedStyle(document.documentElement)
+              .getPropertyValue("--spot-x")
+              .trim() || "55%";
+          const sy =
+            getComputedStyle(document.documentElement)
+              .getPropertyValue("--spot-y")
+              .trim() || "44%";
+          spotMarker.style.left = sx;
+          spotMarker.style.top = sy;
+        })();
       })();
     </script>
   </body>

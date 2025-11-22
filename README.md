@@ -13,6 +13,12 @@ Photo note:
 
 - The `boyboy.webp` photo shows Rupert lying on his back with his tummy exposed — a rare and dignified pose. The page contains a playful "Offer Tummy Rub" button; he may tolerate a brief rub if he's recently been fed.
 
+Spotlight feature:
+
+- The page now has a radial 'spotlight' that highlights Rupert's tummy. Press "Toggle Spotlight" to enable/disable it.
+- Click "Edit Spotlight" then click the image to position the spotlight center; adjust spot size and intensity using the sliders.
+- Spotlight settings are persisted to localStorage to keep your preferred position/intensity.
+
 How to view
 
 1. Place `boyboy.webp` in the repository root (if not already placed).
